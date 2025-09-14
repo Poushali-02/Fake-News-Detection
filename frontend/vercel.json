@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/analyze",
+      "destination": "https://fake-news-detector-api.vercel.app/analyze"
+    }
+  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "regions": ["all"]
+}

@@ -60,7 +60,8 @@ def predict(type_of_content: str, content: str, tag:str):
 
 
 app = Flask(__name__, static_folder='frontend/dist')
-CORS(app)
+# Enable CORS for all domains in development, specific domain in production
+CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "https://fake-news-detector.vercel.app"]}})
 
 @app.route('/analyze', methods=['POST'])
 def api_predict():

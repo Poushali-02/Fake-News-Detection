@@ -15,7 +15,12 @@ function App() {
     setResult(null)
 
     try {
-      const response = await fetch('/analyze', {
+      // Use environment variable for API URL in production, otherwise use relative path
+      const apiUrl = import.meta.env.VITE_API_URL 
+        ? `${import.meta.env.VITE_API_URL}/analyze` 
+        : '/analyze';
+        
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
