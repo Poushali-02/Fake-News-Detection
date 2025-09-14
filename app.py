@@ -62,7 +62,7 @@ def predict(type_of_content: str, content: str, tag:str):
 app = Flask(__name__, static_folder='frontend/dist')
 CORS(app)
 
-@app.route('/api/predict', methods=['POST'])
+@app.route('/analyze', methods=['POST'])
 def api_predict():
     data = request.json
     type_of_content = data.get('type_of_content')
