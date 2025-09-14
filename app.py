@@ -1,4 +1,5 @@
-# from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 import numpy as np
 import pandas as pd 
 import re
@@ -27,10 +28,13 @@ def clean_text(text: str) -> str:
 def get_content(content: str, type_of: str) -> str:
     cleaned_text = ""
     if type_of == 'url':
-        article = Article(url)
-        article.download()
-        article.parse()
-        cleaned_text = clean_text(article.text)
+        try:
+            article = Article(content)
+            article.download()
+            article.parse()
+            cleaned_text = clean_text(article.text)
+        except Exception as e:
+            print(f"Error processing URL: {e}")
         return cleaned_text
     elif type_of == 'text':
         cleaned_text = clean_text(content)
@@ -52,22 +56,38 @@ def predict(type_of_content: str, content: str, tag:str):
     prediction_xgb = model.predict(dtest_new)
     prob_xgb = (prediction_xgb > 0.5).astype(int)
     pred_xgb = "The news is false" if prob_xgb == 0 else "The news is true"
-    return pred_xgb, prediction_xgb[0]
+    return pred_xgb, float(prediction_xgb[0])
 
 
-url = "https://www.indiatvnews.com/rajasthan/jaipur-rains-old-house-building-collapses-near-subhash-chowk-area-deaths-several-injured-watch-video-2025-09-06-1006927"
+app = Flask(__name__, static_folder='frontend/dist')
+CORS(app)
 
-print("---URL Prediction---")
-pred, prediction_xgb = predict(type_of_content='url', content=url, tag='politics')
-print(pred)
-print(f"Probability of True news:{ prediction_xgb:.2f}")
+@app.route('/api/predict', methods=['POST'])
+def api_predict():
+    data = request.json
+    type_of_content = data.get('type_of_content')
+    content = data.get('content')
+    tag = data.get('tag')
 
-article = '''
+    if not type_of_content or not content or not tag:
+        return jsonify({'error': 'Missing required fields'}), 400
 
-Late Friday night, a four-storey dilapidated building collapsed suddenly in the Chile Ka Kuwan area of Subhash Chowk, Jaipur. The tragic incident claimed the lives of 33-year-old Prabhat and his 6-year-old daughter, Pihu, while four others, including Prabhat’s wife Sunita, sustained serious injuries. Rescue operations by the State Disaster Response Force (SDRF) and Civil Defence continued throughout the night, saving seven people trapped under the debris. The building housed over 20 tenants, mostly migrant labourer families. Continuous heavy rainfall had weakened the limestone structure, which led to the collapse.
+    result_text, probability = predict(type_of_content, content, tag)
+    
+    return jsonify({
+        'prediction': 'REAL' if probability > 0.5 else 'FAKE',
+        'confidence': probability,
+        'message': result_text
+    })
 
-'''
-print("---Text Prediction---")
-pred, prediction_xgb = predict(type_of_content='text', content=article, tag='politics')
-print(pred)
-print(f"Probability of True news:{ prediction_xgb:.2f}")
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    try:
+        return app.send_static_file(path)
+    except:
+        return app.send_static_file('index.html')
+
+if __name__ == '__main__':
+    print("Starting Flask server...")
+    app.run(host='0.0.0.0', port=5000, debug=True)
