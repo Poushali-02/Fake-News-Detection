@@ -8,7 +8,6 @@ from keras.models import load_model
 import warnings
 warnings.filterwarnings('ignore')
 
-# model = tf.keras.models.load_model("model.keras")
 tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", use_safetensors=False)
 bert_model = TFBertModel.from_pretrained("bert-base-uncased", use_safetensors=False)
 
@@ -28,7 +27,6 @@ def clean_text(text: str) -> str:
     return text
 
 def preprocess_data(content: str):
-    # Tokenize the content
     content = clean_text(content)
     try:
         encoded_new = tokenizer(
@@ -93,7 +91,6 @@ def api_predict():
     print("Result:", result_text, "Probability:", probability)
     print("content:", content)
     
-    # Prepare response data
     if probability == 0.0 and "Unable to analyze" in result_text:
         response_data = {
             'prediction': 'UNKNOWN',
@@ -107,7 +104,6 @@ def api_predict():
             'message': result_text
         }
     
-    # Add flash message if available
     if flash_message:
         response_data['flash_message'] = flash_message
     

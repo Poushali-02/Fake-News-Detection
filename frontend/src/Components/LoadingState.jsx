@@ -29,31 +29,31 @@ const LoadingState = () => {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           <h3 className="text-2xl font-bold mb-2">Analyzing Article</h3>
         </div>
-        <p className="text-gray-600 max-w-sm">Our AI is examining the content for patterns and indicators of misinformation...</p>
+        <p className="text-gray-600 dark:text-gray-400 max-w-sm">Our AI is examining the content for patterns and indicators of misinformation...</p>
         
         {/* Progress bar */}
-        <div className="mt-6 w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="mt-6 w-64 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-full animate-pulse"
                style={{ width: '100%', animationDuration: '1.5s' }}></div>
         </div>
         
         {/* Features being analyzed */}
-        <div className="mt-6 grid grid-cols-3 gap-3 text-xs text-gray-500">
+        <div className="mt-6 grid grid-cols-3 gap-3 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mb-1">
+            <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-1">
               <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping opacity-75"></div>
             </div>
             <span>Language</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mb-1">
+            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center mb-1">
               <div className="w-3 h-3 bg-indigo-500 rounded-full animate-ping opacity-75"
                    style={{ animationDelay: '0.5s' }}></div>
             </div>
             <span>Sources</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mb-1">
+            <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-1">
               <div className="w-3 h-3 bg-purple-500 rounded-full animate-ping opacity-75"
                    style={{ animationDelay: '1s' }}></div>
             </div>
