@@ -8,6 +8,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
+  const [flashMessage, setFlashMessage] = useState(null)
 
   const handleSubmit = async (formData) => {
     setLoading(true)
@@ -15,12 +16,7 @@ function App() {
     setResult(null)
 
     try {
-      // Use environment variable for API URL in production, otherwise use relative path
-      const apiUrl = import.meta.env.VITE_API_URL 
-        ? `${import.meta.env.VITE_API_URL}/analyze` 
-        : '/analyze';
-        
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -30,7 +26,7 @@ function App() {
 
       if (!response.ok) {
         if (response.status === 415) {
-          throw new Error('Invalid content type. Please ensure you\'re sending valid data.')
+          throw new Error('Is this even a valid URL or text? Please check and try again.')
         } else {
           throw new Error(`Server error: ${response.status}`)
         }
@@ -41,6 +37,11 @@ function App() {
       // Check for API-level errors
       if (data.error) {
         throw new Error(data.error)
+      }
+      
+      // Check for flash messages
+      if (data.flash_message) {
+        setFlashMessage(data.flash_message)
       }
       
       // Check for empty content after processing
@@ -60,6 +61,7 @@ function App() {
   const handleReset = () => {
     setResult(null)
     setError(null)
+    setFlashMessage(null)
   }
 
   return (
@@ -100,7 +102,7 @@ function App() {
           
           {/* Content */}
           <div className="relative z-10 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-            {!result && !loading && <Input onSubmit={handleSubmit} loading={loading} />}
+            {!result && !loading && <Input onSubmit={handleSubmit} loading={loading} flashMessage={flashMessage} />}
             
             {loading && <LoadingState />}
             
