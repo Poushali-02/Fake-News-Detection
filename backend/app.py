@@ -22,8 +22,6 @@ def predict():
             'confidence': 0.0,
             'message': flash_message
         })
-    print("Result:", result_text, "Probability:", probability)
-    print("content:", content)
         
     if probability == 0.0 and "Unable to analyze" in result_text:
         response_data = {
