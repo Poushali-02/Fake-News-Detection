@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: fake-news-backend
+    env: python
+    buildCommand: |
+      # Install Python 3.11 (Kaggle version)
+      apt-get update && apt-get install -y python3.11 python3.11-venv python3.11-dev gcc g++
+      
+      # Create ISOLATED virtual environment (exact replica)
+      python3.11 -m venv /opt/render/venv
+      source /opt/render/venv/bin/activate
+      
+      pip install --upgrade pip setuptools wheel
+      
+      # Install remaining deps 
+      pip install -r requirements.txt --no-deps
+    startCommand: |
+      source /opt/render/venv/bin/activate && python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.13
