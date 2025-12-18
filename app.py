@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request, flash
-from flask_cors import CORS
+from flask import Flask, jsonify, request, render_template
 import numpy as np
 import re
 import tensorflow as tf
@@ -62,60 +61,45 @@ def predict_label(content: str):
 
 app = Flask(__name__, static_folder='frontend/dist')
 
-CORS(app, resources={r"/*": {
-    "origins": ["http://localhost:5173", "https://fake-news-detector.vercel.app", 
-                "https://fake-news-detection-six-inky.vercel.app", "*"],
-    "methods": ["GET", "POST", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
-    "supports_credentials": True
-}})
+@app.route('/analyze', methods=['GET', 'POST'])
+def predict():
+    if request.method == 'POST':
+        data = request.json
+        type_of_content = data.get('type_of_content')
+        content = data.get('content')
+        tag = data.get('tag')
 
-@app.route('/analyze', methods=['POST'])
-def api_predict():
-    data = request.json
-    type_of_content = data.get('type_of_content')
-    content = data.get('content')
-    tag = data.get('tag')
-
-    if not type_of_content or not content or not tag:
-        return jsonify({'error': 'Missing required fields'}), 400
+        if not type_of_content or not content or not tag:
+            return jsonify({'error': 'Missing required fields'}), 400
 
 
-    result_text, probability, flash_message = predict_label(content)
-    if result_text is None and flash_message:
-        return jsonify({
-            'prediction': 'UNKNOWN',
-            'confidence': 0.0,
-            'message': flash_message
-        })
-    print("Result:", result_text, "Probability:", probability)
-    print("content:", content)
-    
-    if probability == 0.0 and "Unable to analyze" in result_text:
-        response_data = {
-            'prediction': 'UNKNOWN',
-            'confidence': probability,
-            'message': result_text
-        }
-    else:
-        response_data = {
-            'prediction': 'REAL' if probability > 0.5 else 'FAKE',
-            'confidence': probability,
-            'message': result_text
-        }
-    
-    if flash_message:
-        response_data['flash_message'] = flash_message
-    
-    return jsonify(response_data)
-
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    try:
-        return app.send_static_file(path)
-    except:
-        return app.send_static_file('index.html')
+        result_text, probability, flash_message = predict_label(content)
+        if result_text is None and flash_message:
+            return jsonify({
+                'prediction': 'UNKNOWN',
+                'confidence': 0.0,
+                'message': flash_message
+            })
+        print("Result:", result_text, "Probability:", probability)
+        print("content:", content)
+        
+        if probability == 0.0 and "Unable to analyze" in result_text:
+            response_data = {
+                'prediction': 'UNKNOWN',
+                'confidence': probability,
+                'message': result_text
+            }
+        else:
+            response_data = {
+                'prediction': 'REAL' if probability > 0.5 else 'FAKE',
+                'confidence': probability,
+                'message': result_text
+            }
+        
+        if flash_message:
+            response_data['flash_message'] = flash_message
+        
+        return jsonify(response_data)
 
 if __name__ == '__main__':
     print("Starting Flask server...")
