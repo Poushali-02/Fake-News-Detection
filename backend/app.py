@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, request, send_from_directory
 from Utilities.utils import predict_label
 import os
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder='../frontend/dist')
+
+CORS(app, origins=["*"])
 
 @app.route('/predict', methods=['POST'])
 def predict():
